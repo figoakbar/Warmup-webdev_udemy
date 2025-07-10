@@ -4,13 +4,6 @@ var userClickedPattern = [];
 var started = false;
 level = 0;
 
-$('div[type="button"]').click(function() {
-        let userChosenColour = $(this).attr("id");
-        userClickedPattern.push(userChosenColour);
-        playSound(userChosenColour);
-        animatePress(userChosenColour);
-});
-
 $(document).keydown(function(){
     if(!started){
         $("#level-title").text("Level " + level);
@@ -19,10 +12,18 @@ $(document).keydown(function(){
     }
 })
 
+$('div[type="button"]').click(function() {
+        let userChosenColour = $(this).attr("id");
+        userClickedPattern.push(userChosenColour);
+        playSound(userChosenColour);
+        animatePress(userChosenColour);
+        checkAnswer(userClickedPattern.length - 1);
+});
+
 function nextSequence(){
     level++
     $("#level-title").text("Level " + level);
-    var randNum = Math.floor(Math.random() * 3) + 1;
+    var randNum = arrColor[Math.floor(Math.random() * 4)];
     var chosenColour = arrColor[randNum]; 
     gamePattern.push(chosenColour);   
 
@@ -47,5 +48,21 @@ function animatePress(currentColour){
 }
 
 function checkAnswer(currentLevel){
-    
+    if(gamePattern[currentLevel] === userClickedPattern[currentLevel]){
+        if(gamePattern.length === userClickedPattern.length){
+            setTimeout(nextSequence, 1000);
+        }
+    } else{
+        playSound("wrong");
+        $("body").addClass("game-over");
+        $("#level-title").text("Game Over! Press Any Key to Restart");
+        setTimeout(() => $("body").removeClass("game-over"), 200);
+        startOver();
+    }
+}
+
+function startOver(){
+    level = 0;
+    gamePattern = [];
+    started = false;
 }
